@@ -34,7 +34,7 @@ class CustomerModalController extends Controller
         $customer = Customer::where('id', $id)->first();
         return response()->json([
             'message' => 'Data Berhasil Diambil!',
-            'data'    => $customer  
+            'data'    => $customer
         ]);
     }
 
@@ -48,10 +48,11 @@ class CustomerModalController extends Controller
 
         return redirect('/modal/customer');
     }
-    
+
     public function delete($id)
     {
         $customer = Customer::find($id)->delete();
         return redirect('/modal/customer');
     }
 }
+

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Produk;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class ProdukController extends Controller
 {
@@ -24,7 +25,7 @@ class ProdukController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Responsen
+     * @return \Illuminate\Http\Response
      */
     public function create()
     {
@@ -39,7 +40,20 @@ class ProdukController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
+        $validator = Validator::make($request->all(), [
+            'nama' => 'required|max:255',
+            'deskripsi' => 'required',
+            'harga' => 'integer',
+            'file' => 'mimes:jpeg,jpg,png',
+        ]);
+
+        if ($validator->fails()) {
+            return back()
+                        ->withErrors($validator)
+                        ->withInput();
+        }
+
+        // Cek apakah upload file
         if ($request->hasFile('file')) {
             $name = $request->file('file');
             $fileName = 'Produk_' . time() . '.' . $name->getClientOriginalExtension();
@@ -75,7 +89,8 @@ class ProdukController extends Controller
      */
     public function edit($id)
     {
-        //
+        $produk = Produk::where('id', $id)->first();
+        return view('master.product.product_edit', compact('produk'));
     }
 
     /**
@@ -85,9 +100,49 @@ class ProdukController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+
+        $validator = Validator::make($request->all(), [
+            'nama' => 'required|max:255',
+            'deskripsi' => 'required',
+            'harga' => 'integer',
+            'file' => 'mimes:jpeg,jpg,png',
+        ]);
+
+        if ($validator->fails()) {
+            return back()
+                        ->withErrors($validator)
+                        ->withInput();
+        }
+
+        $produk = Produk::where('id', $request->id)->first();
+
+        // Cek apakah upload file
+        if ($request->hasFile('file')) {
+
+            // Menghapus file lama dari storage
+            $delete = Storage::delete('public/gambar/' . $produk->file);
+
+            // Upload file baru dengan format nama ditentukan
+            $name = $request->file('file');
+            $fileName = 'Produk_' . time() . '.' . $name->getClientOriginalExtension();
+            $path = Storage::putFileAs('public/gambar', $request->file('file'), $fileName);
+
+            // Update file di database
+            $produk->update([
+                'file' => $fileName,
+            ]);
+        }
+
+        // Update Data di database
+        $produk->update([
+            'nama' => $request->nama,
+            'deskripsi' => $request->deskripsi,
+            'harga' => $request->harga,
+        ]);
+
+        return redirect('/produk')->with('Sukses!', 'Data Berhasil Diupdate');
     }
 
     /**
@@ -98,6 +153,13 @@ class ProdukController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $produk = Produk::where('id', $id)->first();
+
+        // Menghapus file lama dari storage
+        $delete = Storage::delete('public/gambar/' . $produk->file);
+        // Delete data dari database
+        $produk->delete();
+
+        return redirect('/produk')->with('Sukses!', 'Data Berhasil Dihapus');
     }
 }

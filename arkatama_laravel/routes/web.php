@@ -1,12 +1,12 @@
 <?php
 
-use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\CustomerModalController;
-use App\Http\Controllers\ItemController;
-use App\Http\Controllers\LandingController;
-use App\Http\Controllers\LoginController;
-use App\Http\Controllers\ProdukController;
-use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\customercontroller;
+use App\Http\Controllers\customerModalController;
+use App\Http\Controllers\itemcontroller;
+use App\Http\Controllers\Landingcontroller;
+use App\Http\Controllers\Logincontroller;
+use App\Http\Controllers\Produkcontroller;
+use App\Http\Controllers\Registercontroller;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,13 +27,13 @@ use Illuminate\Support\Facades\Route;
 // Practice Route
 
 Route::get('/hello', function() {
-    return 'Nama Saya Aan!';
+    return 'Halo Ges';
 });
 
 Route::redirect('/nama', '/hello');
 
 Route::fallback(function() {
-    return 'Halaman ini tidak ada!';
+    return 'Halaman tidak ada ro';
 });
 
 Route::get('/conflict/nokia', function() {
@@ -59,6 +59,9 @@ Route::get('/', [LandingController::class, 'index']);
 Route::get('/produk', [ProdukController::class, 'index'])->middleware('auth');
 Route::get('/produk-create', [ProdukController::class, 'create'])->middleware('auth');
 Route::post('/produk-store', [ProdukController::class, 'store'])->middleware('auth');
+Route::put('/produk-update', [ProdukController::class, 'update'])->middleware('auth');
+Route::get('/produk-edit/{id}', [ProdukController::class, 'edit'])->middleware('auth');
+Route::get('/produk-delete/{id}', [ProdukController::class, 'destroy'])->middleware('auth');
 
 // Route Customer
 Route::get('/customer', [CustomerController::class, 'index'])->middleware('auth');
